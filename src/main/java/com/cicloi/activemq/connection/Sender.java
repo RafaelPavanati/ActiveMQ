@@ -22,6 +22,13 @@ public class Sender {
         jmsTemplate.send(session -> {
             Message msg = session.createMessage();
             msg.setJMSMessageID(UUID.randomUUID().toString());
+
+            /**
+             * Ao definir JMSXGroupID As mensagens em um grupo de mensagens são sempre consumidas pelo mesmo consumidor, mesmo se
+             * houver muitos consumidores em uma fila. Eles fixam todas as mensagens com o mesmo ID de grupo para o mesmo consumidor.
+             * Este recurso pode ser usado se caso for necessário que todas as mensagens de um determinado cliente
+             * seja executado pelo mesmo consumidor passando assim como parametro o contexto para o JMSXGroupID
+             */
             msg.setStringProperty("JMSXGroupID", "Group-0");
             return msg;
         });

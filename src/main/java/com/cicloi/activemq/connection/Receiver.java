@@ -5,12 +5,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 
-import javax.jms.MapMessage;
 import javax.jms.Message;
+import javax.jms.MessageListener;
 
 
 @Component
-public class Receiver {
+public class Receiver implements MessageListener {
 
     private static final Logger LOGGER =
             LoggerFactory.getLogger(Receiver.class);
@@ -20,8 +20,13 @@ public class Receiver {
      * e se conectar a mais de um broker
      */
 
-    @JmsListener(destination = "helloworld.q")
+    @JmsListener(destination = "queue.teste")
     public void onMessage(Message message) {
+        LOGGER.info("received message: '{}'", message);
+    }
+
+    @JmsListener(destination = "topic.teste", containerFactory = "jmsFactoryTopic")
+    public void onMessageTopic(Message message) {
         LOGGER.info("received message: '{}'", message);
     }
 }

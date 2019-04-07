@@ -25,7 +25,7 @@ public class Connection {
     @Value("${spring.activemq.password}")
     private String password;
 
-    @Bean(name = "localConection")
+    @Bean
     public ActiveMQConnectionFactory connectionFactory() {
         if ("".equals(user)) {
             return new ActiveMQConnectionFactory(brokerUrl);
@@ -36,10 +36,25 @@ public class Connection {
     @Bean
     public JmsListenerContainerFactory jmsFactoryTopic(ConnectionFactory connectionFactory,
                                                        DefaultJmsListenerContainerFactoryConfigurer configurer) {
+
         DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
         configurer.configure(factory, connectionFactory);
         factory.setPubSubDomain(true);
-        factory.setConcurrency("-1");
+
+        /**Usamos assinaturas duráveis para garantir a entrega da mensagem enviada para um tópico.
+         *
+         */
+
+        factory.setClientId("teste");
+        factory.setSubscriptionDurable(true);
+
+        /**
+         * Esse contêiner de listener sempre manterá o número mínimo de consumidores ( setConcurrentConsumers(int))
+         * e aumentará lentamente  até o número máximo de consumidores setMaxConcurrentConsumers(int)
+         * em caso de aumento de carga.
+         */
+        factory.setConcurrency("1-1");
+
         return factory;
     }
 
